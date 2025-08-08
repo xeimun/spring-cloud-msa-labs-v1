@@ -1,0 +1,17 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # 상대경로
+          search-locations: file:///${user.dir}/backend/config-repo
+
+          # 절대경로
+          # search-locations: C:\Dev\projects\spring-cloud-msa-labs-v1\backend\config-repo
