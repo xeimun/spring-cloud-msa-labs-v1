@@ -12,3 +12,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+management:
+  endpoints:
+    exposure:
+      include: health, info, refresh
+
+  endpoint:
+    refresh:
+      enabled: true
