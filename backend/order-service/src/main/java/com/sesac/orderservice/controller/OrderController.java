@@ -4,6 +4,8 @@ import com.sesac.orderservice.dto.OrderRequestDto;
 import com.sesac.orderservice.entity.Order;
 import com.sesac.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,4 +45,14 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/my")
+    @Operation(summary = "내 주문 목록", description = "로그인한 사용자의 주문 목록을 조회합니다.")
+    public ResponseEntity<List<Order>> getMyOrders(HttpServletRequest request) {
+        String userIdHeader = request.getHeader("X-User-Id");
+        if (userIdHeader == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Order> orders = orderService.getOrders(Long.parseLong(userIdHeader));
+        return ResponseEntity.ok(orders);
+    }
 }
