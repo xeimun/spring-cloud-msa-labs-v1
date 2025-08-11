@@ -31,7 +31,7 @@ public class UserService {
                                           () -> new RuntimeException("User not found with email" + request.getEmail())
                                   );
 
-        if (passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }
 
