@@ -8,6 +8,7 @@ import com.sesac.orderservice.dto.OrderRequestDto;
 import com.sesac.orderservice.entity.Order;
 import com.sesac.orderservice.repository.OrderRepository;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,5 +50,9 @@ public class OrderService {
         order.setStatus("COMPLETED");
 
         return orderRepository.save(order);
+    }
+
+    public List<Order> getOrders(Long userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 }
