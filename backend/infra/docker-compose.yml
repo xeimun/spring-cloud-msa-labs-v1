@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: msa-zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      msa-network:
+
   mysql:
     image: mysql:8.0
     container_name: msa-mysql
