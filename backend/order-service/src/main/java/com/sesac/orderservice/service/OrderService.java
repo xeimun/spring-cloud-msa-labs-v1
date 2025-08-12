@@ -1,10 +1,10 @@
 package com.sesac.orderservice.service;
 
-import com.sesac.orderservice.client.ProductServiceClient;
 import com.sesac.orderservice.client.dto.ProductDto;
 import com.sesac.orderservice.client.dto.UserDto;
 import com.sesac.orderservice.dto.OrderRequestDto;
 import com.sesac.orderservice.entity.Order;
+import com.sesac.orderservice.facade.ProductServiceFacade;
 import com.sesac.orderservice.facade.UserServiceFacade;
 import com.sesac.orderservice.repository.OrderRepository;
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final UserServiceFacade userServiceFacade;
-    private final ProductServiceClient productServiceClient;
+    private final ProductServiceFacade productServiceFacade;
 
     @Transactional(readOnly = true)
     public Order findById(Long id) {
@@ -35,7 +35,7 @@ public class OrderService {
             throw new RuntimeException("User not found");
         }
 
-        ProductDto product = productServiceClient.getProductById(request.getProductId());
+        ProductDto product = productServiceFacade.getProductWithFallback(request.getProductId());
         if (product == null) {
             throw new RuntimeException("Product not found");
         }
