@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3307/order_service_db
 
-#User Service 호출에 대한 회복성 패턴
+# User Service 호출에 대한 회복성 패턴
 resilience4j:
   circuitbreakerAspectOrder: 1
   circuitbreaker:
@@ -18,6 +18,7 @@ resilience4j:
         minimum-number-of-calls: 3
         failure-rate-threshold: 50
         permitted-number-of-calls-in-half-open-state: 2
+
   retry:
     retryAspectOrder: 2
     instances:
