@@ -2,6 +2,6 @@ spring:
   config:
     import: "configserver:http://localhost:8888"
   application:
-    name: order-service
+    name: notification-service
   profiles:
     active: dev

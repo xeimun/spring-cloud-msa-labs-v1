@@ -5,6 +5,12 @@ spring:
       hibernate:
         format_sql: true
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin123
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] %-5level %logger{36} - %msg%n"
@@ -36,3 +42,13 @@ otel:
   resource:
     attributes:
       service.name: ${spring.application.name}
+
+order:
+  event:
+    exchange: order.exchange
+    queue:
+      notification: order.notification.queue
+      inventory: order.inventory.queue
+    routing-key:
+      notification: order.notification
+      inventory: order.inventory

@@ -4,12 +4,15 @@ import com.sesac.orderservice.client.dto.ProductDto;
 import com.sesac.orderservice.client.dto.UserDto;
 import com.sesac.orderservice.dto.OrderRequestDto;
 import com.sesac.orderservice.entity.Order;
+import com.sesac.orderservice.event.OrderCreatedEvent;
+import com.sesac.orderservice.event.OrderEventPublisher;
 import com.sesac.orderservice.facade.ProductServiceFacade;
 import com.sesac.orderservice.facade.UserServiceFacade;
 import com.sesac.orderservice.repository.OrderRepository;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class OrderService {
     private final UserServiceFacade userServiceFacade;
     private final ProductServiceFacade productServiceFacade;
     private final Tracer tracer;
+    private final OrderEventPublisher orderEventPublisher;
 
     @Transactional(readOnly = true)
     public Order findById(Long id) {
@@ -51,14 +55,24 @@ public class OrderService {
                 throw new RuntimeException("Product not found");
             }
 
-            if (product.getStockQuantity() < request.getQuantity()) {
-                throw new RuntimeException("Product has less than stock quantity");
-            }
+            // if (product.getStockQuantity() < request.getQuantity()) {
+            //     throw new RuntimeException("Product has less than stock quantity");
+            // }
 
             Order order = new Order();
             order.setUserId(user.getId());
             order.setTotalAmount(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
             order.setStatus("COMPLETED");
+
+            OrderCreatedEvent event = new OrderCreatedEvent(
+                    order.getId(),
+                    request.getUserId(),
+                    request.getProductId(),
+                    request.getQuantity(),
+                    order.getTotalAmount(),
+                    LocalDateTime.now()
+            );
+            orderEventPublisher.publishOrderCreated(event);
 
             return orderRepository.save(order);
 
