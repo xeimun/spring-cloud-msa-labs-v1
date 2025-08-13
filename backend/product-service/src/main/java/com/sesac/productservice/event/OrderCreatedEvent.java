@@ -1,4 +1,4 @@
-package com.sesac.notificationservice.event;
+package com.sesac.productservice.event;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
