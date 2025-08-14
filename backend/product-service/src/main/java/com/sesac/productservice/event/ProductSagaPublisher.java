@@ -29,7 +29,7 @@ public class ProductSagaPublisher {
 
     public void publishInventoryFailed(InventoryFailedEvent event) {
         log.info("재고 실패 요청 이벤트 발행 - orderId: {}, reason: {}", event.getOrderId(), event.getReason());
-        rabbitTemplate.convertAndSend(exchange, paymentRequestRoutingKey, event);
+        rabbitTemplate.convertAndSend(exchange, inventoryFailedRoutingKey, event);
         log.info("재고 실패 요청 이벤트 발행 완료");
     }
 }
