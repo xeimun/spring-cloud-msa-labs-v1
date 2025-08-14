@@ -9,9 +9,10 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OrderEventListener {
+public class ProductSagaHandler {
 
     private final ProductService productService;
+    private final ProductSagaPublisher productSagaPublisher;
 
     @RabbitListener(queues = "${order.event.queue.inventory}")
     public void handleOrderEvent(OrderCreatedEvent event) {
@@ -19,8 +20,26 @@ public class OrderEventListener {
 
         try {
             productService.decreaseStock(event.getProductId(), event.getQuantity());
+            PaymentRequestEvent paymentRequestEvent = new PaymentRequestEvent(
+                    event.getOrderId(),
+                    event.getUserId(),
+                    event.getProductId(),
+                    event.getQuantity(),
+                    event.getTotalAmount()
+            );
+
+            productSagaPublisher.publishPaymentRequest(paymentRequestEvent);
+
         } catch (Exception e) {
             log.error("재고 차감 실패 - productId: {}", event.getProductId());
+
+            InventoryFailedEvent inventoryFailedEvent = new InventoryFailedEvent(
+                    event.getOrderId(),
+                    event.getProductId(),
+                    event.getQuantity(),
+                    "재고 부족"
+            );
+            productSagaPublisher.publishInventoryFailed(inventoryFailedEvent);
         }
     }
 }
