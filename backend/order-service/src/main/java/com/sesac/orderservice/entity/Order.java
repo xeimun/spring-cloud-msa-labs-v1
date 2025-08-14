@@ -31,7 +31,7 @@ public class Order {
 
     private BigDecimal totalAmount;
 
-    private String status = "PENDING";
+    private OrderStatus status;
 
     @CreationTimestamp
     @Column(updatable = false)
