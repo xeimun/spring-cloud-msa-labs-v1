@@ -64,6 +64,7 @@ public class OrderService {
             order.setUserId(user.getId());
             order.setTotalAmount(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
             order.setStatus(OrderStatus.PENDING);
+            Order savedOrder = orderRepository.save(order);
 
             OrderCreatedEvent event = new OrderCreatedEvent(
                     order.getId(),
@@ -75,7 +76,7 @@ public class OrderService {
             );
             orderEventPublisher.publishOrderCreated(event);
 
-            return orderRepository.save(order);
+            return savedOrder;
 
         } catch (Exception e) {
             span.tag("error", e.getMessage());
