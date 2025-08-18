@@ -1,4 +1,4 @@
-package com.sesac.orderservice.entity;
+package com.sesac.paymentservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,34 +9,37 @@ import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "orders")
-@Getter
-@Setter
+@Table(name = "payments")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true, nullable = false)
+    private Long orderId;
+
+    @Column(nullable = false)
     private Long userId;
 
-    private BigDecimal totalAmount;
+    @Column(nullable = false)
+    private BigDecimal amount;
 
-    private OrderStatus status;
+    @Column(nullable = false)
+    private PaymentStatus status;
+
+    private String paymentMethod;
+
+    private String failureReason;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 }

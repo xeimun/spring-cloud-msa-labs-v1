@@ -31,6 +31,18 @@ public class RabbitConfig {
     @Value("${order.event.routing-key.inventory}")
     private String inventoryRoutingKey;
 
+    @Value("${order.event.queue.payment-request}")
+    private String paymentRequestQueue;
+
+    @Value("${order.event.queue.inventory-failed}")
+    private String inventoryFailedQueue;
+
+    @Value("${order.event.routing-key.payment-request}")
+    private String paymentRequestRoutingKey;
+
+    @Value("${order.event.routing-key.inventory-failed}")
+    private String inventoryFailedRoutingKey;
+
     // Exchange 정의
     @Bean
     public TopicExchange orderExchange() {
@@ -48,6 +60,16 @@ public class RabbitConfig {
         return QueueBuilder.durable(inventoryQueue).build();
     }
 
+    @Bean
+    public Queue paymentRequestQueue() {
+        return QueueBuilder.durable(paymentRequestQueue).build();
+    }
+
+    @Bean
+    public Queue inventoryFailedQueue() {
+        return QueueBuilder.durable(inventoryFailedQueue).build();
+    }
+
     // Binding 정의
     @Bean
     public Binding notificationBinding() {
@@ -61,6 +83,20 @@ public class RabbitConfig {
         return BindingBuilder.bind(inventoryQueue())
                              .to(orderExchange())
                              .with(inventoryRoutingKey);
+    }
+
+    @Bean
+    public Binding paymentRequestBinding() {
+        return BindingBuilder.bind(paymentRequestQueue())
+                             .to(orderExchange())
+                             .with(paymentRequestRoutingKey);
+    }
+
+    @Bean
+    public Binding inventoryFailedBinding() {
+        return BindingBuilder.bind(inventoryFailedQueue())
+                             .to(orderExchange())
+                             .with(inventoryFailedRoutingKey);
     }
 
     // JSON 메시지 컨버터 추가

@@ -39,4 +39,11 @@ public class ProductService {
 
         log.info("재고 차감 완료 - 상품: {}, 남은 재고: {}", product.getName(), product.getStockQuantity());
     }
+
+    public void restoreStock(Long productId, Integer quantity) {
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new RuntimeException("Product not found with id" + productId));
+
+        product.setStockQuantity(product.getStockQuantity() + quantity);
+    }
 }

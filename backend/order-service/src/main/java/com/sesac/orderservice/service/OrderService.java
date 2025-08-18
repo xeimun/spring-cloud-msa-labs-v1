@@ -4,6 +4,7 @@ import com.sesac.orderservice.client.dto.ProductDto;
 import com.sesac.orderservice.client.dto.UserDto;
 import com.sesac.orderservice.dto.OrderRequestDto;
 import com.sesac.orderservice.entity.Order;
+import com.sesac.orderservice.entity.OrderStatus;
 import com.sesac.orderservice.event.OrderCreatedEvent;
 import com.sesac.orderservice.event.OrderEventPublisher;
 import com.sesac.orderservice.facade.ProductServiceFacade;
@@ -62,7 +63,8 @@ public class OrderService {
             Order order = new Order();
             order.setUserId(user.getId());
             order.setTotalAmount(product.getPrice().multiply(BigDecimal.valueOf(request.getQuantity())));
-            order.setStatus("COMPLETED");
+            order.setStatus(OrderStatus.PENDING);
+            Order savedOrder = orderRepository.save(order);
 
             OrderCreatedEvent event = new OrderCreatedEvent(
                     order.getId(),
@@ -74,7 +76,7 @@ public class OrderService {
             );
             orderEventPublisher.publishOrderCreated(event);
 
-            return orderRepository.save(order);
+            return savedOrder;
 
         } catch (Exception e) {
             span.tag("error", e.getMessage());
