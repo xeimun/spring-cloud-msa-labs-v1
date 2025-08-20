@@ -1,0 +1,104 @@
+# Docker 환경에서 모든 서비스가 공통으로 사용할 설정
+spring:
+  jpa:
+    show-sql: false  # 로그 볼륨 최적화
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: rabbitmq  # Docker 서비스명 사용
+    port: 5672
+    username: admin
+    password: admin123
+    template:
+      observation-enabled: true
+    listener:
+      simple:
+        observation-enabled: true
+      direct:
+        observation-enabled: true
+
+# Eureka 클라이언트 설정 (Docker 환경)
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Docker 환경 정보
+info:
+  environment: "Docker"
+  debug: false
+
+# 분산 추적 설정 (Zipkin 서비스명 사용)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,tracing
+  tracing:
+    sampling:
+      probability: 0.5  # Docker 환경에서 성능 최적화
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
+
+# OpenTelemetry 설정
+otel:
+  exporter:
+    zipkin:
+      endpoint: http://zipkin:9411/api/v2/spans
+  resource:
+    attributes:
+      service.name: ${spring.application.name}
+
+# 로깅 패턴 (Docker 컨테이너용 최적화)
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId:-},%X{spanId:-}] %-5level [%thread] %logger{36} - %msg%n"
+  level:
+    root: INFO
+    com.sesac: INFO
+    com.yuncoding: INFO
+    com.captainyun7: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+
+# 주문 이벤트 큐 설정
+order:
+  event:
+    exchange: order.exchange
+    queue:
+      notification: order.notification.queue
+      inventory: order.inventory.queue
+      payment-request: order.payment.request.queue
+      inventory-failed: order.inventory.failed.queue
+      payment-completed: order.payment.completed.queue
+      payment-failed: order.payment.failed.queue
+      inventory-restore: order.inventory.restore.queue
+    routing-key:
+      notification: order.notification
+      inventory: order.inventory
+      payment-request: order.payment.request
+      inventory-failed: order.inventory.failed
+      payment-completed: order.payment.completed
+      payment-failed: order.payment.failed
+      inventory-restore: order.inventory.restore
+
+# Docker 환경 데이터베이스 기본 설정
+datasource:
+  common:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 600000
+      max-lifetime: 1800000
